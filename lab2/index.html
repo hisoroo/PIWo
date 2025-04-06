@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pl" class="hide-scrollbar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Lab 2 - Programowanie interfejsów webowych">
+    <meta name="author" content="Bartosz">
+    <title>TODO</title>
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="hide-scrollbar">
+    
+    <div class="content">
+        <header class="todo-header">
+            <button class="sidebar-toggle" title="sidebar toggle">
+                <img src="assets/nav-arrow-right.svg" alt="toggle sidebar">
+            </button>
+            <h1>TODO</h1>
+            <button class="scroll-btn" title="scrollbar toggle">
+                <img src="assets/mouse-cursor.png" alt="scrollbar toggle">
+            </button>
+        </header>
+
+        <main>
+            <div class="sidebar">
+                <div class="sidebar-content">
+                    <h2 class="sidebar-header">TODO</h2>
+                    <div class="search-container">
+                        <input type="text" class="sidebar-search" placeholder="Search...">
+                        <label class="checkbox-container">
+                            <input type="checkbox">
+                            <span class="checkmark"></span>
+                            <span class="checkbox-label">Aa</span>
+                        </label>
+                    </div>
+
+                    <div class="dropdown-list">
+                        <div class="dropdown-header">Critical</div>
+                        <ul class="dropdown-content">
+                        </ul>
+                    </div>
+
+                    <div class="dropdown-list">
+                        <div class="dropdown-header">Important</div>
+                        <ul class="dropdown-content">
+                        </ul>
+                    </div>
+
+                    <div class="dropdown-list">
+                        <div class="dropdown-header">Non-urgent</div>
+                        <ul class="dropdown-content">
+                        </ul>
+                    </div>
+
+                    <button class="create-list-btn">Add Custom List</button>
+                </div>
+            </div>
+            <div class="todo-container">
+                <div class="tile-separator"><span></span></div>
+        </main>
+    </div>
+    <div class="modal">
+        <div class="modal-content">
+            <h2>New List</h2>
+            <div class="modal-input-container">
+                <input type="text" class="list-name-input" placeholder="List name...">
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel-btn">Cancel</button>
+                <button class="modal-btn confirm-btn">Create</button>
+            </div>
+        </div>
+    </div>
+    <div class="delete-modal modal">
+        <div class="modal-content">
+            <h2>Delete Task</h2>
+            <pre class="modal-text"></pre>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel-btn">Cancel</button>
+                <button class="modal-btn confirm-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
