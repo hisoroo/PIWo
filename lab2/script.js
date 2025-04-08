@@ -1,5 +1,7 @@
+"use strict";
+
 // init
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
   initSeparators();
   initScrollButton();
   initSidebar();
@@ -10,99 +12,99 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // init logic
 function initSeparators() {
-    document.querySelectorAll(".tile-separator").forEach((separator) => {
-      separator.addEventListener("click", handleSeparatorClick);
-    });
+  document.querySelectorAll(".tile-separator").forEach((separator) => {
+    separator.addEventListener("click", handleSeparatorClick);
+  });
+}
+
+function initScrollButton() {
+  const scrollBtn = document.querySelector(".scroll-btn");
+  if (scrollBtn) {
+    scrollBtn.addEventListener("click", toggleScrollbarVisibility);
   }
-  
-  function initScrollButton() {
-    const scrollBtn = document.querySelector(".scroll-btn");
-    if (scrollBtn) {
-      scrollBtn.addEventListener("click", toggleScrollbarVisibility);
-    }
+}
+
+function toggleScrollbarVisibility() {
+  const html = document.documentElement;
+  const body = document.body;
+  const isHidden = html.classList.contains("hide-scrollbar");
+
+  if (isHidden) {
+    html.classList.remove("hide-scrollbar");
+    body.classList.remove("hide-scrollbar");
+  } else {
+    html.classList.add("hide-scrollbar");
+    body.classList.add("hide-scrollbar");
   }
-  
-  function toggleScrollbarVisibility() {
-    const html = document.documentElement;
-    const body = document.body;
-    const isHidden = html.classList.contains("hide-scrollbar");
-  
-    if (isHidden) {
-      html.classList.remove("hide-scrollbar");
-      body.classList.remove("hide-scrollbar");
-    } else {
-      html.classList.add("hide-scrollbar");
-      body.classList.add("hide-scrollbar");
-    }
-  }
-  
-  function initSidebar() {
-    const sidebarToggle = document.querySelector('.sidebar-toggle');
-    const sidebar = document.querySelector('.sidebar');
-    const content = document.querySelector('.content');
-    const toggleImg = sidebarToggle.querySelector('img');
-  
-    sidebarToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
-      content.classList.toggle('sidebar-active');
-      toggleImg.classList.toggle('rotated');
-    });
-  }
-  
-  function initDropdowns() {
-    const dropdownLists = document.querySelectorAll('.dropdown-list');
-    dropdownLists.forEach(dropdown => {
-      const header = dropdown.querySelector('.dropdown-header');
-      header.addEventListener('click', () => {
-        dropdownLists.forEach(other => {
-          if (other !== dropdown) {
-            other.classList.remove('active');
-          }
-        });
-        dropdown.classList.toggle('active');
+}
+
+function initSidebar() {
+  const sidebarToggle = document.querySelector('.sidebar-toggle');
+  const sidebar = document.querySelector('.sidebar');
+  const content = document.querySelector('.content');
+  const toggleImg = sidebarToggle.querySelector('img');
+
+  sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+    content.classList.toggle('sidebar-active');
+    toggleImg.classList.toggle('rotated');
+  });
+}
+
+function initDropdowns() {
+  const dropdownLists = document.querySelectorAll('.dropdown-list');
+  dropdownLists.forEach(dropdown => {
+    const header = dropdown.querySelector('.dropdown-header');
+    header.addEventListener('click', () => {
+      dropdownLists.forEach(other => {
+        if (other !== dropdown) {
+          other.classList.remove('active');
+        }
       });
+      dropdown.classList.toggle('active');
     });
-  
-    const createListBtn = document.querySelector('.create-list-btn');
-    const modal = document.querySelector('.modal');
-    const cancelBtn = modal.querySelector('.cancel-btn');
-    const confirmBtn = modal.querySelector('.confirm-btn');
-    const input = modal.querySelector('.list-name-input');
-  
-    createListBtn.addEventListener('click', () => {
-      modal.classList.add('active');
-      input.value = '';
-      input.focus();
-    });
-  
-    cancelBtn.addEventListener('click', () => {
+  });
+
+  const createListBtn = document.querySelector('.create-list-btn');
+  const modal = document.querySelector('.modal');
+  const cancelBtn = modal.querySelector('.cancel-btn');
+  const confirmBtn = modal.querySelector('.confirm-btn');
+  const input = modal.querySelector('.list-name-input');
+
+  createListBtn.addEventListener('click', () => {
+    modal.classList.add('active');
+    input.value = '';
+    input.focus();
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    modal.classList.remove('active');
+  });
+
+  confirmBtn.addEventListener('click', () => {
+    const listName = input.value.trim();
+    if (listName) {
+      createCustomList(listName);
       modal.classList.remove('active');
-    });
-  
-    confirmBtn.addEventListener('click', () => {
+    }
+  });
+
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
       const listName = input.value.trim();
       if (listName) {
         createCustomList(listName);
         modal.classList.remove('active');
       }
-    });
-  
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        const listName = input.value.trim();
-        if (listName) {
-          createCustomList(listName);
-          modal.classList.remove('active');
-        }
-      }
-    });
-  
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.remove('active');
-      }
-    });
-  }
+    }
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.remove('active');
+    }
+  });
+}
 
 // TODOs
 function handleSeparatorClick(event) {
@@ -148,48 +150,34 @@ function createTile() {
   const listSelect = newTile.querySelector('.todo-list-select');
   updateListOptions(listSelect);
 
-  listSelect.addEventListener('change', () => {
-    const selectedList = listSelect.value;
-  });
-
-  let clickTimeout = null;
-  const handleTileClick = (e) => {
+  newTile.addEventListener("dblclick", (e) => {
     if (newTile.classList.contains("tile-new")) return;
 
-    if (clickTimeout === null) {
-      clickTimeout = setTimeout(() => {
-        clickTimeout = null;
-      }, 300);
-    } else {
-      clearTimeout(clickTimeout);
-      clickTimeout = null;
-      if (
-        e.target === newTile ||
-        e.target === titleElement ||
-        e.target === contentElement
-      ) {
-        newTile.classList.toggle("completed");
-        if (newTile.classList.contains("completed")) {
-          const now = new Date();
-          const formattedDate = now.toLocaleString("en-GB", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-            weekday: "long",
-            timeZone: "Europe/Warsaw",
-          });
-          completionDate.textContent = `Completed: ${formattedDate}`;
-        } else {
-          completionDate.textContent = "";
-        }
+    if (
+      e.target === newTile ||
+      e.target === titleElement ||
+      e.target === contentElement
+    ) {
+      newTile.classList.toggle("completed");
+
+      if (newTile.classList.contains("completed")) {
+        const now = new Date();
+        const formattedDate = now.toLocaleString("en-GB", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          weekday: "long",
+          timeZone: "Europe/Warsaw",
+        });
+        completionDate.textContent = `Completed: ${formattedDate}`;
+      } else {
+        completionDate.textContent = "";
       }
     }
-  };
-
-  newTile.addEventListener("click", handleTileClick);
+  });
 
   function cleanText(text) {
     return text
@@ -253,35 +241,35 @@ function createTile() {
     const deleteModal = document.querySelector('.delete-modal');
     const cancelBtn = deleteModal.querySelector('.cancel-btn');
     const confirmBtn = deleteModal.querySelector('.confirm-btn');
-    
+
     const taskTitle = titleElement.textContent || 'Untitled Task';
     const taskDescription = contentElement.textContent || 'No description';
-    
+
     deleteModal.querySelector('.modal-text').innerHTML = `Are you sure you want to delete the task <b>${taskTitle}</b> with the description:\n\n<b>${taskDescription}</b>`;
     deleteModal.classList.add('active');
 
     const handleCancel = () => {
-        deleteModal.classList.remove('active');
-        cleanup();
+      deleteModal.classList.remove('active');
+      cleanup();
     };
 
     const handleConfirm = () => {
-        newTile.nextElementSibling?.remove();
-        newTile.remove();
-        deleteModal.classList.remove('active');
-        cleanup();
+      newTile.nextElementSibling?.remove();
+      newTile.remove();
+      deleteModal.classList.remove('active');
+      cleanup();
     };
 
     const handleOutsideClick = (e) => {
-        if (e.target === deleteModal) {
-            handleCancel();
-        }
+      if (e.target === deleteModal) {
+        handleCancel();
+      }
     };
 
     const cleanup = () => {
-        cancelBtn.removeEventListener('click', handleCancel);
-        confirmBtn.removeEventListener('click', handleConfirm);
-        deleteModal.removeEventListener('click', handleOutsideClick);
+      cancelBtn.removeEventListener('click', handleCancel);
+      confirmBtn.removeEventListener('click', handleConfirm);
+      deleteModal.removeEventListener('click', handleOutsideClick);
     };
 
     cancelBtn.addEventListener('click', handleCancel);
@@ -295,29 +283,29 @@ function createTile() {
 // lists
 function addTodoToList(todoId, title, selectedList) {
   if (selectedList) {
-      const listDropdowns = document.querySelectorAll('.dropdown-list');
-      let targetDropdown;
-      listDropdowns.forEach(dropdown => {
-          if (dropdown.querySelector('.dropdown-header').textContent === selectedList) {
-              targetDropdown = dropdown.querySelector('.dropdown-content');
-          }
-      });
-
-      if (targetDropdown) {
-          const listItem = document.createElement('li');
-          listItem.textContent = title || 'Untitled Task';
-          listItem.setAttribute('data-todo-id', todoId);
-          listItem.addEventListener('click', () => {
-              const todoElement = document.getElementById(listItem.getAttribute('data-todo-id'));
-              if (todoElement) {
-                  todoElement.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'center'
-                  });
-              }
-          });
-          targetDropdown.appendChild(listItem);
+    const listDropdowns = document.querySelectorAll('.dropdown-list');
+    let targetDropdown;
+    listDropdowns.forEach(dropdown => {
+      if (dropdown.querySelector('.dropdown-header').textContent === selectedList) {
+        targetDropdown = dropdown.querySelector('.dropdown-content');
       }
+    });
+
+    if (targetDropdown) {
+      const listItem = document.createElement('li');
+      listItem.textContent = title || 'Untitled Task';
+      listItem.setAttribute('data-todo-id', todoId);
+      listItem.addEventListener('click', () => {
+        const todoElement = document.getElementById(listItem.getAttribute('data-todo-id'));
+        if (todoElement) {
+          todoElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        }
+      });
+      targetDropdown.appendChild(listItem);
+    }
   }
 }
 
@@ -325,7 +313,7 @@ function updateListOptions(selectElement) {
   while (selectElement.options.length > 1) {
     selectElement.remove(1);
   }
-  
+
   const lists = document.querySelectorAll('.dropdown-list .dropdown-header');
   lists.forEach(list => {
     const option = document.createElement('option');
@@ -338,28 +326,28 @@ function updateListOptions(selectElement) {
 function createCustomList(listName) {
   const sidebarContent = document.querySelector('.sidebar-content');
   const createListBtn = document.querySelector('.create-list-btn');
-  
+
   const customList = document.createElement('div');
   customList.className = 'dropdown-list';
-  
+
   customList.innerHTML = `
       <div class="dropdown-header">${listName}</div>
       <ul class="dropdown-content"></ul>
   `;
-  
+
   const header = customList.querySelector('.dropdown-header');
   header.addEventListener('click', () => {
-      const dropdownLists = document.querySelectorAll('.dropdown-list');
-      dropdownLists.forEach(other => {
-          if (other !== customList) {
-              other.classList.remove('active');
-          }
-      });
-      customList.classList.toggle('active');
+    const dropdownLists = document.querySelectorAll('.dropdown-list');
+    dropdownLists.forEach(other => {
+      if (other !== customList) {
+        other.classList.remove('active');
+      }
+    });
+    customList.classList.toggle('active');
   });
-  
+
   sidebarContent.insertBefore(customList, createListBtn);
-  
+
   document.querySelectorAll('.todo-list-select').forEach(select => {
     updateListOptions(select);
   });
@@ -389,16 +377,16 @@ function filterTasks() {
   }
 
   const listsWithMatches = new Set();
-  
+
   allListItems.forEach(item => {
     const todoId = item.getAttribute('data-todo-id');
     const todoElement = document.getElementById(todoId);
-    
+
     if (!todoElement) return;
 
     const matches = searchForMatches(todoElement, searchTerm, isCaseSensitive);
     item.style.display = matches ? '' : 'none';
-    
+
     if (matches) {
       listsWithMatches.add(item.closest('.dropdown-list'));
     }
@@ -411,8 +399,8 @@ function searchForMatches(todoElement, searchTerm, isCaseSensitive) {
   const title = todoElement.querySelector('.todo-title').textContent;
   const content = todoElement.querySelector('.tile-content').textContent;
   const text = `${title} ${content}`;
-  
-  return isCaseSensitive 
+
+  return isCaseSensitive
     ? text.includes(searchTerm)
     : text.toLowerCase().includes(searchTerm.toLowerCase());
 }
