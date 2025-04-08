@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
   initScrollButton();
   initSidebar();
   initDropdowns();
+  initCreateListModal();
   initSearch();
 });
 
@@ -64,7 +65,9 @@ function initDropdowns() {
       dropdown.classList.toggle('active');
     });
   });
+}
 
+function initCreateListModal() {
   const createListBtn = document.querySelector('.create-list-btn');
   const modal = document.querySelector('.modal');
   const cancelBtn = modal.querySelector('.cancel-btn');
