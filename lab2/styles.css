@@ -153,6 +153,7 @@ header.todo-header .subtitle {
     position: absolute;
     opacity: 0;
     transition: var(--transition-smooth);
+    transform-origin: center;
 }
 
 .tile-separator:hover {
