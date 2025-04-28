@@ -7,6 +7,8 @@ import {
   ScrollRestoration,
 } from "react-router";
 
+import { BookProvider } from "./contexts/DataContext.tsx";
+
 import stylesheet from "./app.css?url";
 
 export const links = () => [
@@ -42,7 +44,12 @@ export function Layout({ children }) {
 }
 
 export default function App() {
-  return <Outlet />;
+
+  return (
+    <BookProvider>
+      <Outlet />
+    </BookProvider>
+  );
 }
 
 export function ErrorBoundary({ error }) {
