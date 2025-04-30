@@ -1,12 +1,16 @@
-import React, { createContext, useState } from 'react';
-import { Book, Cover } from '../interfaces/Book.tsx';
+import React, { createContext, useState } from "react";
+import { Book, Cover } from "../interfaces/Book.tsx";
 
 export interface BookContextType {
   bookList: Book[];
-  setBookList;
+  setBookList: React.Dispatch<React.SetStateAction<Book[]>>;
 }
 
-export const BookContext = createContext<BookContextType | undefined>(undefined);
+const defaultContextValue: BookContextType = {
+  bookList: [],
+  setBookList: () => {},
+};
+export const BookContext = createContext<BookContextType>(defaultContextValue);
 
 export const BookProvider = ({ children }) => {
   const [bookList, setBookList] = useState<Book[]>([
@@ -19,7 +23,7 @@ export const BookProvider = ({ children }) => {
       price: 19.99,
       num_pages: 123,
       cover: Cover.Paperback,
-      description: "Egzystencjalna powieść o absurdzie życia i alienacji."
+      description: "Egzystencjalna powieść o absurdzie życia i alienacji.",
     },
     {
       id: 2,
@@ -30,7 +34,7 @@ export const BookProvider = ({ children }) => {
       price: 24.99,
       num_pages: 328,
       cover: Cover.Hardcover,
-      description: "Dystopijna wizja totalitarnego społeczeństwa."
+      description: "Dystopijna wizja totalitarnego społeczeństwa.",
     },
     {
       id: 3,
@@ -41,7 +45,7 @@ export const BookProvider = ({ children }) => {
       price: 14.99,
       num_pages: 279,
       cover: Cover.Paperback,
-      description: "Klasyczna powieść romantyczna o miłości i społeczeństwie."
+      description: "Klasyczna powieść romantyczna o miłości i społeczeństwie.",
     },
     {
       id: 4,
@@ -52,7 +56,7 @@ export const BookProvider = ({ children }) => {
       price: 29.99,
       num_pages: 671,
       cover: Cover.Hardcover,
-      description: "Psychologiczna powieść o winie, karze i moralności."
+      description: "Psychologiczna powieść o winie, karze i moralności.",
     },
   ]);
 
@@ -62,4 +66,3 @@ export const BookProvider = ({ children }) => {
     </BookContext.Provider>
   );
 };
-
