@@ -8,6 +8,7 @@ import {
 } from "react-router";
 
 import { BookProvider } from "./contexts/DataContext.tsx";
+import Header from "./components/Header.tsx";
 
 import stylesheet from "./app.css?url";
 
@@ -34,7 +35,10 @@ export function Layout({ children }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="pt-16">
+        <div className="fixed top-0 w-full z-50">
+          <Header />
+        </div>
         {children}
         <ScrollRestoration />
         <Scripts />
