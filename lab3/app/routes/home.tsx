@@ -1,9 +1,11 @@
 import { BookContext } from "../contexts/DataContext";
-import React, { useContext, useState, useCallback } from "react";
+import React, { useContext, useState, useEffect, useCallback } from "react";
 import { Book, Cover } from "../interfaces/Book";
 import BookTile from "../components/BookTile";
 import Filters from "../components/Filters";
 import AddButton from "../components/AddButton";
+import { auth } from "../services/firebase";
+import { onAuthStateChanged, User } from "firebase/auth";
 
 export const meta = () => {
   return [
@@ -18,6 +20,7 @@ interface FilterState {
   pagesMin: string;
   pagesMax: string;
   coverType: Cover | "";
+  filterScope: string;
 }
 
 const initialFilterState: FilterState = {
@@ -26,13 +29,29 @@ const initialFilterState: FilterState = {
   pagesMin: "",
   pagesMax: "",
   coverType: "",
+  filterScope: "",
 };
 
 export default function Home() {
   const context = useContext(BookContext);
   const [query, setQuery] = useState("");
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-  const [activeFilters, setActiveFilters] = useState<FilterState>(initialFilterState);
+  const [activeFilters, setActiveFilters] =
+    useState<FilterState>(initialFilterState);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (!currentUser) {
+        setActiveFilters((prevFilters) => ({
+          ...prevFilters,
+          filterScope: "",
+        }));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   if (!context) {
     throw new Error("Home must be used within a BookProvider");
@@ -49,8 +68,9 @@ export default function Home() {
 
   const filteredBooks = booksToDisplay
     .filter((it: Book) => {
-      const searchMatch = (it.title.toLowerCase() + it.author.toLowerCase())
-        .includes(query.toLowerCase());
+      const searchMatch = (
+        it.title.toLowerCase() + it.author.toLowerCase()
+      ).includes(query.toLowerCase());
 
       const priceMin = parseFloat(activeFilters.priceMin);
       const priceMax = parseFloat(activeFilters.priceMax);
@@ -68,11 +88,19 @@ export default function Home() {
       const coverMatch =
         !activeFilters.coverType || it.cover === activeFilters.coverType;
 
-      return searchMatch && priceMatch && pagesMatch && coverMatch;
+      const scopeMatch =
+        !activeFilters.filterScope ||
+        (activeFilters.filterScope === "my" && user && it.userId === user.uid);
+
+      return searchMatch && scopeMatch && priceMatch && pagesMatch && coverMatch;
     })
     .sort((a: Book, b: Book) => a.title.localeCompare(b.title));
 
-  const bookListHTML = filteredBooks.map((it: Book) => <BookTile key={it.id} book={it} />);
+  const bookListHTML = filteredBooks.map((it: Book) => (
+    <BookTile key={it.id} book={it} />
+  ));
+
+  const isUserLoggedIn = !!user;
 
   return (
     <main className="container mx-auto p-4 flex flex-col items-center">
@@ -81,9 +109,7 @@ export default function Home() {
           <input
             className="p-2 flex-grow focus:outline-none bg-transparent text-gray-950"
             placeholder="Szukaj książek..."
-            onChange={(e) =>
-              setQuery(e.target.value)
-            }
+            onChange={(e) => setQuery(e.target.value)}
             value={query}
             autoFocus
           />
@@ -95,11 +121,12 @@ export default function Home() {
           </button>
         </div>
         <div className="relative -mt-1">
-           <Filters
-             isOpen={isFiltersOpen}
-             filters={activeFilters}
-             onApplyFilters={applyFilters}
-           />
+          <Filters
+            isOpen={isFiltersOpen}
+            filters={activeFilters}
+            onApplyFilters={applyFilters}
+            isUserLoggedIn={isUserLoggedIn}
+          />
         </div>
       </div>
 
