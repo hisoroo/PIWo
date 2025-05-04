@@ -1,4 +1,5 @@
 import React from 'react';
+import { login } from '../services/UserService.tsx';
 
 const Header = () => {
   return (
@@ -11,7 +12,7 @@ const Header = () => {
         <button className="px-4 py-2 rounded-lg bg-gray-900 text-white font-semibold shadow-sm hover:bg-gray-800 transition-colors duration-150 border border-gray-800">
           koszyk
         </button>
-        <button className="px-4 py-2 rounded-lg bg-gray-900 text-white font-semibold shadow-sm hover:bg-gray-800 transition-colors duration-150 border border-gray-800">
+        <button onClick={login} className="px-4 py-2 rounded-lg bg-gray-900 text-white font-semibold shadow-sm hover:bg-gray-800 transition-colors duration-150 border border-gray-800">
           zaloguj się
         </button>
       </div>
