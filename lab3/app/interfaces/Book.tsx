@@ -4,7 +4,7 @@ export enum Cover {
 }
 
 export interface Book {
-    id: number;
+    id: string;
     img_path: string;
     title: string;
     author: string;
@@ -13,4 +13,5 @@ export interface Book {
     num_pages: number;
     cover: Cover;
     description: string;
+    userId?: string;
 }
