@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import Form from "../components/Form";
 import { BookContext, BookContextType } from "../contexts/DataContext";
 import { Book, Cover } from "../interfaces/Book";
+import { createBook } from "../services/BookService"; // Import createBook
 
 type BookFormData = Omit<Book, 'id' | 'price' | 'num_pages'> & {
     price: string;
@@ -61,7 +62,7 @@ export default function NewBook() {
         dispatch({ type: 'SET_COVER', payload: e.target.value as Cover });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!state.title || !state.author || !state.genre || state.price === "" || state.num_pages === "") {
@@ -69,8 +70,7 @@ export default function NewBook() {
             return;
         }
 
-        const newBook: Book = {
-            id: Date.now(),
+        const bookData: Omit<Book, 'id'> = {
             title: state.title,
             author: state.author,
             genre: state.genre,
@@ -81,8 +81,18 @@ export default function NewBook() {
             img_path: state.img_path || "https://picsum.photos/200/300",
         };
 
-        setBookList((prevList) => [...prevList, newBook]);
-        navigate("/");
+        try {
+            const createdBook = await createBook(bookData);
+            if (createdBook) {
+                setBookList((prevList) => [...prevList, createdBook]);
+                navigate("/");
+            } else {
+                 alert("Could not add book. Please ensure you are logged in.");
+            }
+        } catch (error) {
+            console.error("Error adding book:", error);
+            alert("An error occurred while adding the book.");
+        }
     };
 
     const coverOptions = Object.values(Cover).map((c) => ({
