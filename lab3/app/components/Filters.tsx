@@ -7,22 +7,25 @@ interface FilterState {
   pagesMin: string;
   pagesMax: string;
   coverType: Cover | "";
+  filterScope: string;
 }
 
 interface FiltersProps {
   isOpen: boolean;
   filters: FilterState;
   onApplyFilters: (newFilters: FilterState) => void;
+  isUserLoggedIn: boolean;
 }
 
-export default function Filters({ isOpen, filters, onApplyFilters }: FiltersProps) {
+export default function Filters({ isOpen, filters, onApplyFilters, isUserLoggedIn }: FiltersProps) {
   const [localFilters, setLocalFilters] = useState<FilterState>(filters);
 
   useEffect(() => {
     if (isOpen) {
-      setLocalFilters(filters);
+      const initialFilters = !isUserLoggedIn ? { ...filters, filterScope: "" } : filters;
+      setLocalFilters(initialFilters);
     }
-  }, [isOpen, filters]);
+  }, [isOpen, filters, isUserLoggedIn]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -30,13 +33,17 @@ export default function Filters({ isOpen, filters, onApplyFilters }: FiltersProp
   };
 
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLocalFilters((prev) => ({ ...prev, coverType: e.target.value as Cover | "" }));
+    const { name, value } = e.target;
+    if (name === 'cover-type') {
+        setLocalFilters((prev) => ({ ...prev, coverType: value as Cover | "" }));
+    } else if (name === 'filter-scope') {
+        setLocalFilters((prev) => ({ ...prev, filterScope: value as "my" | "" }));
+    }
   };
 
   const handleApplyClick = () => {
     onApplyFilters(localFilters);
   };
-
 
   return (
     <div
@@ -48,6 +55,50 @@ export default function Filters({ isOpen, filters, onApplyFilters }: FiltersProp
     >
       {isOpen && (
         <div className="pt-5 pb-4 px-4">
+          {isUserLoggedIn && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-white mb-1">
+                Zakres wyszukiwania
+              </label>
+              <div className="flex flex-wrap gap-x-4 gap-y-2">
+                <div className="flex items-center">
+                  <input
+                    id="scope-my"
+                    name="filter-scope"
+                    type="radio"
+                    value="my"
+                    className="h-4 w-4 text-gray-950 border-white/50 focus:ring-gray-950 bg-white/70"
+                    checked={localFilters.filterScope === 'my'}
+                    onChange={handleRadioChange}
+                  />
+                  <label
+                    htmlFor="scope-my"
+                    className="ml-2 block text-sm text-white"
+                  >
+                    Moje książki
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    id="scope-all"
+                    name="filter-scope"
+                    type="radio"
+                    value=""
+                    className="h-4 w-4 text-gray-950 border-white/50 focus:ring-gray-950 bg-white/70"
+                    checked={localFilters.filterScope === ""}
+                    onChange={handleRadioChange}
+                  />
+                  <label
+                    htmlFor="scope-all"
+                    className="ml-2 block text-sm text-white"
+                  >
+                    Wszystkie książki
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-white mb-1">
               Cena
@@ -160,7 +211,6 @@ export default function Filters({ isOpen, filters, onApplyFilters }: FiltersProp
               </div>
             </div>
           </div>
-
 
           <div className="flex justify-end mt-6">
             <button
