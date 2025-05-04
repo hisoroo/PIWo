@@ -1,8 +1,9 @@
 import { BookContext } from "../contexts/DataContext";
-import React, { useContext, useState } from "react";
-import { Book } from "../interfaces/Book";
+import React, { useContext, useState, useCallback } from "react";
+import { Book, Cover } from "../interfaces/Book";
 import BookTile from "../components/BookTile";
 import Filters from "../components/Filters";
+import AddButton from "../components/AddButton";
 
 export const meta = () => {
   return [
@@ -11,10 +12,27 @@ export const meta = () => {
   ];
 };
 
+interface FilterState {
+  priceMin: string;
+  priceMax: string;
+  pagesMin: string;
+  pagesMax: string;
+  coverType: Cover | "";
+}
+
+const initialFilterState: FilterState = {
+  priceMin: "",
+  priceMax: "",
+  pagesMin: "",
+  pagesMax: "",
+  coverType: "",
+};
+
 export default function Home() {
   const context = useContext(BookContext);
   const [query, setQuery] = useState("");
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<FilterState>(initialFilterState);
 
   if (!context) {
     throw new Error("Home must be used within a BookProvider");
@@ -22,15 +40,39 @@ export default function Home() {
 
   const { bookList } = context;
 
+  const applyFilters = useCallback((newFilters: FilterState) => {
+    setActiveFilters(newFilters);
+    setIsFiltersOpen(false);
+  }, []);
+
   const booksToDisplay: Book[] = Array.isArray(bookList) ? bookList : [];
 
-  const bookListHTML = booksToDisplay
-    .filter((it: Book) =>
-      (it.title.toLowerCase() + it.author.toLowerCase())
-        .includes(query.toLowerCase())
-    )
-    .sort((a: Book, b: Book) => a.title.localeCompare(b.title))
-    .map((it: Book) => <BookTile key={it.id} book={it} />);
+  const filteredBooks = booksToDisplay
+    .filter((it: Book) => {
+      const searchMatch = (it.title.toLowerCase() + it.author.toLowerCase())
+        .includes(query.toLowerCase());
+
+      const priceMin = parseFloat(activeFilters.priceMin);
+      const priceMax = parseFloat(activeFilters.priceMax);
+      const pagesMin = parseInt(activeFilters.pagesMin, 10);
+      const pagesMax = parseInt(activeFilters.pagesMax, 10);
+
+      const priceMatch =
+        (isNaN(priceMin) || it.price >= priceMin) &&
+        (isNaN(priceMax) || it.price <= priceMax);
+
+      const pagesMatch =
+        (isNaN(pagesMin) || it.num_pages >= pagesMin) &&
+        (isNaN(pagesMax) || it.num_pages <= pagesMax);
+
+      const coverMatch =
+        !activeFilters.coverType || it.cover === activeFilters.coverType;
+
+      return searchMatch && priceMatch && pagesMatch && coverMatch;
+    })
+    .sort((a: Book, b: Book) => a.title.localeCompare(b.title));
+
+  const bookListHTML = filteredBooks.map((it: Book) => <BookTile key={it.id} book={it} />);
 
   return (
     <main className="container mx-auto p-4 flex flex-col items-center">
@@ -53,13 +95,19 @@ export default function Home() {
           </button>
         </div>
         <div className="relative -mt-1">
-           <Filters isOpen={isFiltersOpen} />
+           <Filters
+             isOpen={isFiltersOpen}
+             filters={activeFilters}
+             onApplyFilters={applyFilters}
+           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
         {bookListHTML}
       </div>
+
+      <AddButton />
     </main>
   );
 }
