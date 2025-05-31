@@ -18,10 +18,12 @@ interface InputProps {
   label?: string;
   type?: string;
   containerClasses?: string;
-  value: string | number;
-  onChange: (e) => void;
+  value?: string | number;
+  onChange?: (e) => void;
   required?: boolean;
   step?: string | number;
+  ref: any;
+  defaultValue?: string | number;
 }
 
 function Input({
@@ -63,10 +65,12 @@ interface SelectProps {
   id: string;
   label?: string;
   options: { value: string | number; label: string }[];
-  value: string | number;
-  onChange: (e) => void;
+  value?: string | number;
+  onChange?: (e) => void;
   containerClasses?: string;
   required?: boolean;
+  defaultValue?: string | number;
+  ref?: any;
 }
 
 function Select({
@@ -114,9 +118,10 @@ interface TextAreaProps {
   id: string;
   label?: string;
   placeholder?: string;
-  value: string;
-  onChange: (e) => void;
+  value?: string;
+  onChange?: (e) => void;
   containerClasses?: string;
+  ref: any;
 }
 
 function TextArea({

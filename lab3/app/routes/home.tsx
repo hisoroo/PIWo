@@ -57,7 +57,7 @@ export default function Home() {
     throw new Error("Home must be used within a BookProvider");
   }
 
-  const { bookList } = context;
+  const { bookList, setBookList } = context;
 
   const applyFilters = useCallback((newFilters: FilterState) => {
     setActiveFilters(newFilters);
@@ -96,8 +96,14 @@ export default function Home() {
     })
     .sort((a: Book, b: Book) => a.title.localeCompare(b.title));
 
+  const handleBookDeleted = (bookId: string) => {
+    if (setBookList) {
+      setBookList(prevBookList => prevBookList.filter(book => book.id !== bookId));
+    }
+  };
+
   const bookListHTML = filteredBooks.map((it: Book) => (
-    <BookTile key={it.id} book={it} />
+    <BookTile key={it.id} book={it} currentUserId={user?.uid} onBookDeleted={handleBookDeleted} />
   ));
 
   const isUserLoggedIn = !!user;
